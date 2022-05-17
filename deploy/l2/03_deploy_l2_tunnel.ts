@@ -10,11 +10,17 @@ const func: DeployFunction = async (hre) => {
 
 	const DefaultProxyAdmin = await ethers.getContract("DefaultProxyAdmin");
 
+	const CloneAbleERC721 = await ethers.getContract("CloneAbleERC721");
+
 	await deploy("L2Tunnel", {
 		from: deployer,
 		log: true,
 		skipIfAlreadyDeployed: true,
-		args: [FxChildAddress, DefaultProxyAdmin.address],
+		args: [
+			FxChildAddress,
+			DefaultProxyAdmin.address,
+			CloneAbleERC721.address,
+		],
 	});
 
 	const L1TunnelAddress = await hre.companionNetworks["l1"].deployments.get(

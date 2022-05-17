@@ -19,33 +19,40 @@ import { Listener, Provider } from "@ethersproject/providers";
 import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
-interface L2TunnelInterface extends ethers.utils.Interface {
+interface MockL1TunnelInterface extends ethers.utils.Interface {
   functions: {
-    "cloneAbleERC721()": FunctionFragment;
-    "fromL1mappedTokens(address)": FunctionFragment;
-    "fxChild()": FunctionFragment;
-    "fxRootTunnel()": FunctionFragment;
+    "SEND_MESSAGE_EVENT_SIG()": FunctionFragment;
+    "checkpointManager()": FunctionFragment;
+    "fxChildTunnel()": FunctionFragment;
+    "fxRoot()": FunctionFragment;
+    "mapERC721(address)": FunctionFragment;
+    "mappedTokenStatus(address)": FunctionFragment;
     "mappedTokens(address)": FunctionFragment;
     "owner()": FunctionFragment;
-    "processMessageFromRoot(uint256,address,bytes)": FunctionFragment;
-    "proxyAdmin()": FunctionFragment;
+    "processedExits(bytes32)": FunctionFragment;
+    "receiveMessage(bytes)": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
-    "setFxRootTunnel(address)": FunctionFragment;
+    "setFxChildTunnel(address)": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "cloneAbleERC721",
+    functionFragment: "SEND_MESSAGE_EVENT_SIG",
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "fromL1mappedTokens",
+    functionFragment: "checkpointManager",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "fxChildTunnel",
+    values?: undefined
+  ): string;
+  encodeFunctionData(functionFragment: "fxRoot", values?: undefined): string;
+  encodeFunctionData(functionFragment: "mapERC721", values: [string]): string;
+  encodeFunctionData(
+    functionFragment: "mappedTokenStatus",
     values: [string]
-  ): string;
-  encodeFunctionData(functionFragment: "fxChild", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "fxRootTunnel",
-    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "mappedTokens",
@@ -53,19 +60,19 @@ interface L2TunnelInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "processMessageFromRoot",
-    values: [BigNumberish, string, BytesLike]
+    functionFragment: "processedExits",
+    values: [BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "proxyAdmin",
-    values?: undefined
+    functionFragment: "receiveMessage",
+    values: [BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "renounceOwnership",
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "setFxRootTunnel",
+    functionFragment: "setFxChildTunnel",
     values: [string]
   ): string;
   encodeFunctionData(
@@ -74,16 +81,21 @@ interface L2TunnelInterface extends ethers.utils.Interface {
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "cloneAbleERC721",
+    functionFragment: "SEND_MESSAGE_EVENT_SIG",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "fromL1mappedTokens",
+    functionFragment: "checkpointManager",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "fxChild", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "fxRootTunnel",
+    functionFragment: "fxChildTunnel",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "fxRoot", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "mapERC721", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "mappedTokenStatus",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -92,16 +104,19 @@ interface L2TunnelInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "processMessageFromRoot",
+    functionFragment: "processedExits",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "proxyAdmin", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "receiveMessage",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "renounceOwnership",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "setFxRootTunnel",
+    functionFragment: "setFxChildTunnel",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -110,21 +125,23 @@ interface L2TunnelInterface extends ethers.utils.Interface {
   ): Result;
 
   events: {
-    "MessageSent(bytes)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
+    "Received(bytes,uint256)": EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: "MessageSent"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Received"): EventFragment;
 }
-
-export type MessageSentEvent = TypedEvent<[string] & { message: string }>;
 
 export type OwnershipTransferredEvent = TypedEvent<
   [string, string] & { previousOwner: string; newOwner: string }
 >;
 
-export class L2Tunnel extends BaseContract {
+export type ReceivedEvent = TypedEvent<
+  [string, BigNumber] & { message: string; _nonce: BigNumber }
+>;
+
+export class MockL1Tunnel extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
@@ -165,39 +182,47 @@ export class L2Tunnel extends BaseContract {
     toBlock?: string | number | undefined
   ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>;
 
-  interface: L2TunnelInterface;
+  interface: MockL1TunnelInterface;
 
   functions: {
-    cloneAbleERC721(overrides?: CallOverrides): Promise<[string]>;
+    SEND_MESSAGE_EVENT_SIG(overrides?: CallOverrides): Promise<[string]>;
 
-    fromL1mappedTokens(
+    checkpointManager(overrides?: CallOverrides): Promise<[string]>;
+
+    fxChildTunnel(overrides?: CallOverrides): Promise<[string]>;
+
+    fxRoot(overrides?: CallOverrides): Promise<[string]>;
+
+    mapERC721(
+      L1TokenAddress: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    mappedTokenStatus(
       arg0: string,
       overrides?: CallOverrides
-    ): Promise<[string]>;
-
-    fxChild(overrides?: CallOverrides): Promise<[string]>;
-
-    fxRootTunnel(overrides?: CallOverrides): Promise<[string]>;
+    ): Promise<[number]>;
 
     mappedTokens(arg0: string, overrides?: CallOverrides): Promise<[string]>;
 
     owner(overrides?: CallOverrides): Promise<[string]>;
 
-    processMessageFromRoot(
-      stateId: BigNumberish,
-      rootMessageSender: string,
-      data: BytesLike,
+    processedExits(
+      arg0: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
+
+    receiveMessage(
+      inputData: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
-
-    proxyAdmin(overrides?: CallOverrides): Promise<[string]>;
 
     renounceOwnership(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    setFxRootTunnel(
-      _fxRootTunnel: string,
+    setFxChildTunnel(
+      _fxChildTunnel: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -207,33 +232,38 @@ export class L2Tunnel extends BaseContract {
     ): Promise<ContractTransaction>;
   };
 
-  cloneAbleERC721(overrides?: CallOverrides): Promise<string>;
+  SEND_MESSAGE_EVENT_SIG(overrides?: CallOverrides): Promise<string>;
 
-  fromL1mappedTokens(arg0: string, overrides?: CallOverrides): Promise<string>;
+  checkpointManager(overrides?: CallOverrides): Promise<string>;
 
-  fxChild(overrides?: CallOverrides): Promise<string>;
+  fxChildTunnel(overrides?: CallOverrides): Promise<string>;
 
-  fxRootTunnel(overrides?: CallOverrides): Promise<string>;
+  fxRoot(overrides?: CallOverrides): Promise<string>;
+
+  mapERC721(
+    L1TokenAddress: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  mappedTokenStatus(arg0: string, overrides?: CallOverrides): Promise<number>;
 
   mappedTokens(arg0: string, overrides?: CallOverrides): Promise<string>;
 
   owner(overrides?: CallOverrides): Promise<string>;
 
-  processMessageFromRoot(
-    stateId: BigNumberish,
-    rootMessageSender: string,
-    data: BytesLike,
+  processedExits(arg0: BytesLike, overrides?: CallOverrides): Promise<boolean>;
+
+  receiveMessage(
+    inputData: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
-
-  proxyAdmin(overrides?: CallOverrides): Promise<string>;
 
   renounceOwnership(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  setFxRootTunnel(
-    _fxRootTunnel: string,
+  setFxChildTunnel(
+    _fxChildTunnel: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -243,34 +273,36 @@ export class L2Tunnel extends BaseContract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    cloneAbleERC721(overrides?: CallOverrides): Promise<string>;
+    SEND_MESSAGE_EVENT_SIG(overrides?: CallOverrides): Promise<string>;
 
-    fromL1mappedTokens(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<string>;
+    checkpointManager(overrides?: CallOverrides): Promise<string>;
 
-    fxChild(overrides?: CallOverrides): Promise<string>;
+    fxChildTunnel(overrides?: CallOverrides): Promise<string>;
 
-    fxRootTunnel(overrides?: CallOverrides): Promise<string>;
+    fxRoot(overrides?: CallOverrides): Promise<string>;
+
+    mapERC721(L1TokenAddress: string, overrides?: CallOverrides): Promise<void>;
+
+    mappedTokenStatus(arg0: string, overrides?: CallOverrides): Promise<number>;
 
     mappedTokens(arg0: string, overrides?: CallOverrides): Promise<string>;
 
     owner(overrides?: CallOverrides): Promise<string>;
 
-    processMessageFromRoot(
-      stateId: BigNumberish,
-      rootMessageSender: string,
-      data: BytesLike,
+    processedExits(
+      arg0: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
+
+    receiveMessage(
+      inputData: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    proxyAdmin(overrides?: CallOverrides): Promise<string>;
-
     renounceOwnership(overrides?: CallOverrides): Promise<void>;
 
-    setFxRootTunnel(
-      _fxRootTunnel: string,
+    setFxChildTunnel(
+      _fxChildTunnel: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -281,14 +313,6 @@ export class L2Tunnel extends BaseContract {
   };
 
   filters: {
-    "MessageSent(bytes)"(
-      message?: null
-    ): TypedEventFilter<[string], { message: string }>;
-
-    MessageSent(
-      message?: null
-    ): TypedEventFilter<[string], { message: string }>;
-
     "OwnershipTransferred(address,address)"(
       previousOwner?: string | null,
       newOwner?: string | null
@@ -304,39 +328,63 @@ export class L2Tunnel extends BaseContract {
       [string, string],
       { previousOwner: string; newOwner: string }
     >;
+
+    "Received(bytes,uint256)"(
+      message?: null,
+      _nonce?: null
+    ): TypedEventFilter<
+      [string, BigNumber],
+      { message: string; _nonce: BigNumber }
+    >;
+
+    Received(
+      message?: null,
+      _nonce?: null
+    ): TypedEventFilter<
+      [string, BigNumber],
+      { message: string; _nonce: BigNumber }
+    >;
   };
 
   estimateGas: {
-    cloneAbleERC721(overrides?: CallOverrides): Promise<BigNumber>;
+    SEND_MESSAGE_EVENT_SIG(overrides?: CallOverrides): Promise<BigNumber>;
 
-    fromL1mappedTokens(
+    checkpointManager(overrides?: CallOverrides): Promise<BigNumber>;
+
+    fxChildTunnel(overrides?: CallOverrides): Promise<BigNumber>;
+
+    fxRoot(overrides?: CallOverrides): Promise<BigNumber>;
+
+    mapERC721(
+      L1TokenAddress: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    mappedTokenStatus(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
-
-    fxChild(overrides?: CallOverrides): Promise<BigNumber>;
-
-    fxRootTunnel(overrides?: CallOverrides): Promise<BigNumber>;
 
     mappedTokens(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     owner(overrides?: CallOverrides): Promise<BigNumber>;
 
-    processMessageFromRoot(
-      stateId: BigNumberish,
-      rootMessageSender: string,
-      data: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
+    processedExits(
+      arg0: BytesLike,
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    proxyAdmin(overrides?: CallOverrides): Promise<BigNumber>;
+    receiveMessage(
+      inputData: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
 
     renounceOwnership(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    setFxRootTunnel(
-      _fxRootTunnel: string,
+    setFxChildTunnel(
+      _fxChildTunnel: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -347,16 +395,25 @@ export class L2Tunnel extends BaseContract {
   };
 
   populateTransaction: {
-    cloneAbleERC721(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    fromL1mappedTokens(
-      arg0: string,
+    SEND_MESSAGE_EVENT_SIG(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    fxChild(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    checkpointManager(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    fxRootTunnel(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    fxChildTunnel(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    fxRoot(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    mapERC721(
+      L1TokenAddress: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    mappedTokenStatus(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     mappedTokens(
       arg0: string,
@@ -365,21 +422,22 @@ export class L2Tunnel extends BaseContract {
 
     owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    processMessageFromRoot(
-      stateId: BigNumberish,
-      rootMessageSender: string,
-      data: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
+    processedExits(
+      arg0: BytesLike,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    proxyAdmin(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    receiveMessage(
+      inputData: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
 
     renounceOwnership(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    setFxRootTunnel(
-      _fxRootTunnel: string,
+    setFxChildTunnel(
+      _fxChildTunnel: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

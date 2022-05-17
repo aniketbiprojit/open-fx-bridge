@@ -74,7 +74,7 @@ contract L1Tunnel is FxBaseRootTunnel, Tunnel {
 			})
 		);
 		bytes memory _messageWithType = abi.encode(
-			MessageType.L2MappingComplete,
+			MessageType.L1MappingInit,
 			_message
 		);
 		_sendMessageToChild(_messageWithType);

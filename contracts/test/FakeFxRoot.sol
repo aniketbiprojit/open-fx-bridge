@@ -23,6 +23,6 @@ contract FakeFxRoot {
 	function sendMessageToChild(address _receiver, bytes calldata _data)
 		public
 	{
-		IFakeFxChild(fxChild).onStateReceive(0, _receiver, msg.sender, _data);
+		// IFakeFxChild(fxChild).onStateReceive(0, _receiver, msg.sender, _data);
 	}
 }

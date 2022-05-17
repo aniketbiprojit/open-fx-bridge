@@ -1,8 +1,6 @@
 // import { ethers } from 'hardhat'
-import { ethers } from "hardhat";
 import { DeployFunction } from "hardhat-deploy/dist/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { FakeFxRoot } from "../../typechain";
 import { skipUnlessTest } from "../../utils";
 // import { TokenDescriptor } from '../../src/types'
 
@@ -13,18 +11,16 @@ const func: DeployFunction = async ({
 	const { deploy } = deployments;
 	const { deployer } = await getNamedAccounts();
 
-	const FxChild = await deploy("FxChild", {
+	await deploy("TestERC721", {
 		from: deployer,
-		contract: "FakeFxChild",
+		contract: "TestERC721",
 		log: true,
 		skipIfAlreadyDeployed: true,
+		args: ["Test", "TT"],
 	});
-
-	const FxRoot = (await ethers.getContract("FxRoot")) as FakeFxRoot;
-	await FxRoot.setFxChild(FxChild.address);
 };
 
 export default func;
 func.dependencies = [];
-func.tags = ["L2", "FxChild", "FxRoot"];
+func.tags = ["L1", "TestERC721"];
 func.skip = skipUnlessTest;

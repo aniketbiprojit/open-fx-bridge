@@ -11,18 +11,23 @@ import "./interfaces/ICloneAbleERC721.sol";
 import "../Tunnel.sol";
 
 contract L2Tunnel is FxBaseChildTunnel, Tunnel {
-	address public _cloneAbleERC721;
+	address public cloneAbleERC721;
 
 	ProxyAdmin public proxyAdmin;
 
-	constructor(address _fxChild, ProxyAdmin _proxyAdmin)
-		FxBaseChildTunnel(_fxChild)
-	{
+	constructor(
+		address _fxChild,
+		ProxyAdmin _proxyAdmin,
+		address _cloneAbleERC721
+	) FxBaseChildTunnel(_fxChild) {
 		proxyAdmin = _proxyAdmin;
+		cloneAbleERC721 = _cloneAbleERC721;
 	}
 
 	// L2 address to L1 address
 	mapping(address => address) public mappedTokens;
+	// L1 address to L2 address
+	mapping(address => address) public fromL1mappedTokens;
 
 	function _deployAndMapERC721(
 		address L1TokenAddress,
@@ -31,7 +36,7 @@ contract L2Tunnel is FxBaseChildTunnel, Tunnel {
 		address tokenContractOwner_
 	) internal {
 		// deploy L2 Token
-		address instance = Clones.clone(_cloneAbleERC721);
+		address instance = Clones.clone(cloneAbleERC721);
 
 		address token = address(
 			new TransparentUpgradeableProxy(
@@ -47,7 +52,9 @@ contract L2Tunnel is FxBaseChildTunnel, Tunnel {
 			)
 		);
 
-		mappedTokens[L1TokenAddress] = token;
+		mappedTokens[token] = L1TokenAddress;
+		fromL1mappedTokens[L1TokenAddress] = token;
+
 		// encode data.
 		bytes memory _message = abi.encode(
 			ERC721MappedData({
@@ -82,13 +89,14 @@ contract L2Tunnel is FxBaseChildTunnel, Tunnel {
 				data,
 				(ERC721MappedData)
 			);
-			return
-				_deployAndMapERC721(
-					mappedData.L1Address,
-					mappedData.name,
-					mappedData.symbol,
-					mappedData.tokenContractOwner
-				);
+
+			_deployAndMapERC721(
+				mappedData.L1Address,
+				mappedData.name,
+				mappedData.symbol,
+				mappedData.tokenContractOwner
+			);
+			return;
 		}
 		revert("Invalid type");
 	}
