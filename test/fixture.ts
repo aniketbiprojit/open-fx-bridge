@@ -10,7 +10,7 @@ export const setupTest = deployments.createFixture(async (hre) => {
 	const users = await getUnnamedAccounts();
 
 	const contracts = {
-		L1Tunnel: (await ethers.getContract("L1Tunnel")) as L1Tunnel,
+		L1Tunnel: (await ethers.getContract("MockL1Tunnel")) as L1Tunnel,
 		L2Tunnel: (await ethers.getContract("L2Tunnel")) as L2Tunnel,
 		TestERC721: (await ethers.getContract("TestERC721")) as TestERC721,
 		FxChild: (await ethers.getContract("FxChild")) as FakeFxChild,

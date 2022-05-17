@@ -35,6 +35,7 @@ specifiers:
   ts-node: ^10.1.0
   typechain: ^5.1.2
   typescript: ^4.5.2
+  utility-types: ^3.10.0
 
 dependencies:
   '@nomiclabs/hardhat-etherscan': 3.0.3_hardhat@2.9.3
@@ -68,6 +69,7 @@ dependencies:
   ts-node: 10.7.0_3wjt2zwv2dlvyy743xkk2n2efq
   typechain: 5.2.0_typescript@4.6.4
   typescript: 4.6.4
+  utility-types: 3.10.0
 
 devDependencies:
   '@nomiclabs/hardhat-ethers': /hardhat-deploy-ethers/0.3.0-beta.13_ethers@5.6.5+hardhat@2.9.3
@@ -9216,6 +9218,11 @@ packages:
       is-typed-array: 1.1.8
       safe-buffer: 5.2.1
       which-typed-array: 1.1.7
+    dev: false
+
+  /utility-types/3.10.0:
+    resolution: {integrity: sha512-O11mqxmi7wMKCo6HKFt5AhO4BwY3VV68YU07tgxfz8zJTIxr4BpsezN49Ffwy9j3ZpwwJp4fkRwjRzq3uWE6Rg==}
+    engines: {node: '>= 4'}
     dev: false
 
   /utils-merge/1.0.1:
