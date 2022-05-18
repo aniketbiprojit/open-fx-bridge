@@ -25,6 +25,6 @@ const func: DeployFunction = async ({
 };
 
 export default func;
-func.dependencies = [];
-func.tags = ["L2", "FxChild", "FxRoot"];
+func.dependencies = ["FxRoot"];
+func.tags = ["L2", "FxChild"];
 func.skip = skipUnlessTest;

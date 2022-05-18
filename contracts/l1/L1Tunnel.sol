@@ -47,7 +47,7 @@ contract L1Tunnel is FxBaseRootTunnel, Tunnel {
 			);
 			return;
 		}
-		revert("Invalid");
+		revert("Invalid type");
 	}
 
 	function mapERC721(address L1TokenAddress) public {

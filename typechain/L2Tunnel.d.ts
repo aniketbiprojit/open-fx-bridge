@@ -110,13 +110,19 @@ interface L2TunnelInterface extends ethers.utils.Interface {
   ): Result;
 
   events: {
+    "L2MappingMappedERC721(address,address,address)": EventFragment;
     "MessageSent(bytes)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
   };
 
+  getEvent(nameOrSignatureOrTopic: "L2MappingMappedERC721"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "MessageSent"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
 }
+
+export type L2MappingMappedERC721Event = TypedEvent<
+  [string, string, string] & { L1Token: string; L2Token: string; from: string }
+>;
 
 export type MessageSentEvent = TypedEvent<[string] & { message: string }>;
 
@@ -281,6 +287,24 @@ export class L2Tunnel extends BaseContract {
   };
 
   filters: {
+    "L2MappingMappedERC721(address,address,address)"(
+      L1Token?: null,
+      L2Token?: null,
+      from?: null
+    ): TypedEventFilter<
+      [string, string, string],
+      { L1Token: string; L2Token: string; from: string }
+    >;
+
+    L2MappingMappedERC721(
+      L1Token?: null,
+      L2Token?: null,
+      from?: null
+    ): TypedEventFilter<
+      [string, string, string],
+      { L1Token: string; L2Token: string; from: string }
+    >;
+
     "MessageSent(bytes)"(
       message?: null
     ): TypedEventFilter<[string], { message: string }>;

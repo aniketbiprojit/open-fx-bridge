@@ -24,6 +24,8 @@ contract L2Tunnel is FxBaseChildTunnel, Tunnel {
 		cloneAbleERC721 = _cloneAbleERC721;
 	}
 
+	event L2MappingMappedERC721(address L1Token, address L2Token, address from);
+
 	// L2 address to L1 address
 	mapping(address => address) public mappedTokens;
 	// L1 address to L2 address
@@ -70,7 +72,7 @@ contract L2Tunnel is FxBaseChildTunnel, Tunnel {
 			uint8(MessageType.L2MappingComplete),
 			_message
 		);
-
+		emit L2MappingMappedERC721(L1TokenAddress, token, tokenContractOwner_);
 		// Send message to L1.
 		_sendMessageToRoot(_messageWithType);
 	}

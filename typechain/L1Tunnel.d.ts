@@ -126,17 +126,23 @@ interface L1TunnelInterface extends ethers.utils.Interface {
 
   events: {
     "L1MappingInitERC721(address,address)": EventFragment;
+    "L1MappingMappedERC721(address,address,address)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
     "Received(bytes,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "L1MappingInitERC721"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "L1MappingMappedERC721"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Received"): EventFragment;
 }
 
 export type L1MappingInitERC721Event = TypedEvent<
   [string, string] & { L1Token: string; from: string }
+>;
+
+export type L1MappingMappedERC721Event = TypedEvent<
+  [string, string, string] & { L1Token: string; L2Token: string; from: string }
 >;
 
 export type OwnershipTransferredEvent = TypedEvent<
@@ -328,6 +334,24 @@ export class L1Tunnel extends BaseContract {
       L1Token?: null,
       from?: null
     ): TypedEventFilter<[string, string], { L1Token: string; from: string }>;
+
+    "L1MappingMappedERC721(address,address,address)"(
+      L1Token?: null,
+      L2Token?: null,
+      from?: null
+    ): TypedEventFilter<
+      [string, string, string],
+      { L1Token: string; L2Token: string; from: string }
+    >;
+
+    L1MappingMappedERC721(
+      L1Token?: null,
+      L2Token?: null,
+      from?: null
+    ): TypedEventFilter<
+      [string, string, string],
+      { L1Token: string; L2Token: string; from: string }
+    >;
 
     "OwnershipTransferred(address,address)"(
       previousOwner?: string | null,
