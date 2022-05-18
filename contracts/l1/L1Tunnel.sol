@@ -12,6 +12,10 @@ contract L1Tunnel is FxBaseRootTunnel, Tunnel {
 		Init,
 		Mapped
 	}
+
+	event L1MappingInitERC721(address L1Token, address from);
+	event L1MappingMappedERC721(address L1Token, address L2Token, address from);
+
 	// L1 address to L2 address
 	mapping(address => address) public mappedTokens;
 	mapping(address => TokenStatus) public mappedTokenStatus;
@@ -36,7 +40,14 @@ contract L1Tunnel is FxBaseRootTunnel, Tunnel {
 			);
 			mappedTokenStatus[mappedData.L1Address] = TokenStatus.Mapped;
 			mappedTokens[mappedData.L1Address] = mappedData.L2Address;
+			emit L1MappingMappedERC721(
+				mappedData.L1Address,
+				mappedData.L2Address,
+				mappedData.tokenContractOwner
+			);
+			return;
 		}
+		revert("Invalid");
 	}
 
 	function mapERC721(address L1TokenAddress) public {
@@ -77,6 +88,8 @@ contract L1Tunnel is FxBaseRootTunnel, Tunnel {
 			MessageType.L1MappingInit,
 			_message
 		);
+		emit L1MappingInitERC721(L1TokenAddress, _msgSender());
+
 		_sendMessageToChild(_messageWithType);
 	}
 

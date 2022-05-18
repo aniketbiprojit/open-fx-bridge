@@ -125,13 +125,19 @@ interface MockL1TunnelInterface extends ethers.utils.Interface {
   ): Result;
 
   events: {
+    "L1MappingInitERC721(address,address)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
     "Received(bytes,uint256)": EventFragment;
   };
 
+  getEvent(nameOrSignatureOrTopic: "L1MappingInitERC721"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Received"): EventFragment;
 }
+
+export type L1MappingInitERC721Event = TypedEvent<
+  [string, string] & { L1Token: string; from: string }
+>;
 
 export type OwnershipTransferredEvent = TypedEvent<
   [string, string] & { previousOwner: string; newOwner: string }
@@ -313,6 +319,16 @@ export class MockL1Tunnel extends BaseContract {
   };
 
   filters: {
+    "L1MappingInitERC721(address,address)"(
+      L1Token?: null,
+      from?: null
+    ): TypedEventFilter<[string, string], { L1Token: string; from: string }>;
+
+    L1MappingInitERC721(
+      L1Token?: null,
+      from?: null
+    ): TypedEventFilter<[string, string], { L1Token: string; from: string }>;
+
     "OwnershipTransferred(address,address)"(
       previousOwner?: string | null,
       newOwner?: string | null
