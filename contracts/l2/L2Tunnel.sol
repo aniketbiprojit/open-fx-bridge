@@ -7,10 +7,12 @@ import "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
 import "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 import "@openzeppelin/contracts/proxy/Clones.sol";
 import "./interfaces/ICloneAbleERC721.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "../Tunnel.sol";
 
-contract L2Tunnel is FxBaseChildTunnel, Tunnel {
+contract L2Tunnel is FxBaseChildTunnel, Tunnel, ReentrancyGuard {
 	address public cloneAbleERC721;
 
 	ProxyAdmin public proxyAdmin;
@@ -116,5 +118,35 @@ contract L2Tunnel is FxBaseChildTunnel, Tunnel {
 			return;
 		}
 		revert("Invalid type");
+	}
+
+	function transferToL1(address L2TokenAddress, uint256 tokenId)
+		external
+		nonReentrant
+	{
+		address L1Address = mappedTokens[L2TokenAddress];
+		require(L1Address != address(0), "Token not mapped");
+		bytes memory _message = abi.encode(
+			ERC721Transfer({
+				L1Address: L1Address,
+				from: _msgSender(),
+				tokenURI: IERC721Metadata(L2TokenAddress).tokenURI(tokenId),
+				tokenId: tokenId
+			})
+		);
+		IERC721(L2TokenAddress).transferFrom(
+			_msgSender(),
+			address(this),
+			tokenId
+		);
+
+		ICloneAbleERC721(L2TokenAddress).burn(tokenId);
+
+		bytes memory _messageWithType = abi.encode(
+			MessageType.L2TransferToL1,
+			_message
+		);
+
+		_sendMessageToRoot(_messageWithType);
 	}
 }

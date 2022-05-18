@@ -49,6 +49,26 @@ contract L1Tunnel is FxBaseRootTunnel, Tunnel, ReentrancyGuard {
 			);
 			return;
 		}
+		if (m == MessageType.L2TransferToL1) {
+			ERC721Transfer memory transferData = abi.decode(
+				data,
+				(ERC721Transfer)
+			);
+
+			address L1TokenAddress = transferData.L1Address;
+			require(
+				mappedTokenStatus[L1TokenAddress] == TokenStatus.Mapped,
+				"Token Not mapped"
+			);
+
+			IERC721(L1TokenAddress).transferFrom(
+				address(this),
+				transferData.from,
+				transferData.tokenId
+			);
+
+			return;
+		}
 		revert("Invalid type");
 	}
 

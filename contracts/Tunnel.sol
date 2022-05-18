@@ -9,7 +9,8 @@ contract Tunnel is Ownable {
 	enum MessageType {
 		L1MappingInit,
 		L2MappingComplete,
-		L1TransferToL2
+		L1TransferToL2,
+		L2TransferToL1
 	}
 
 	struct ERC721MappedData {

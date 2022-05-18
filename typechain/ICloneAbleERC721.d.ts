@@ -21,10 +21,12 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
 interface ICloneAbleERC721Interface extends ethers.utils.Interface {
   functions: {
+    "burn(uint256)": FunctionFragment;
     "initialize(string,string,address,address)": FunctionFragment;
     "mint(address,uint256,string)": FunctionFragment;
   };
 
+  encodeFunctionData(functionFragment: "burn", values: [BigNumberish]): string;
   encodeFunctionData(
     functionFragment: "initialize",
     values: [string, string, string, string]
@@ -34,6 +36,7 @@ interface ICloneAbleERC721Interface extends ethers.utils.Interface {
     values: [string, BigNumberish, string]
   ): string;
 
+  decodeFunctionResult(functionFragment: "burn", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
 
@@ -84,6 +87,11 @@ export class ICloneAbleERC721 extends BaseContract {
   interface: ICloneAbleERC721Interface;
 
   functions: {
+    burn(
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     initialize(
       name_: string,
       symbol_: string,
@@ -99,6 +107,11 @@ export class ICloneAbleERC721 extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
+
+  burn(
+    tokenId: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   initialize(
     name_: string,
@@ -116,6 +129,8 @@ export class ICloneAbleERC721 extends BaseContract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
+    burn(tokenId: BigNumberish, overrides?: CallOverrides): Promise<void>;
+
     initialize(
       name_: string,
       symbol_: string,
@@ -135,6 +150,11 @@ export class ICloneAbleERC721 extends BaseContract {
   filters: {};
 
   estimateGas: {
+    burn(
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     initialize(
       name_: string,
       symbol_: string,
@@ -152,6 +172,11 @@ export class ICloneAbleERC721 extends BaseContract {
   };
 
   populateTransaction: {
+    burn(
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     initialize(
       name_: string,
       symbol_: string,

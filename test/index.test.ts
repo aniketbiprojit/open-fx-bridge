@@ -1,12 +1,13 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import { CloneAbleERC721 } from "../typechain";
+import { CloneAbleERC721, TestERC721 } from "../typechain";
 import { setupTest } from "./fixture";
 
 enum MessageType {
 	L1MappingInit,
 	L2MappingComplete,
 	L1TransferToL2,
+	L2TransferToL1,
 }
 
 enum TokenStatus {
@@ -150,5 +151,46 @@ describe("Index", () => {
 		)
 			.to.emit(L2Token, "Transfer")
 			.withArgs(ethers.constants.AddressZero, alice.address, 1);
+	});
+
+	it("burn on l2 and receive on l1", async () => {
+		const L2Token = (
+			await ethers.getContractAt(
+				"CloneAbleERC721",
+				await deployer.L2Tunnel.fromL1mappedTokens(
+					deployer.TestERC721.address
+				)
+			)
+		).connect(await ethers.getSigner(alice.address)) as CloneAbleERC721;
+		const { L2Tunnel } = alice;
+		await L2Token.setApprovalForAll(L2Tunnel.address, true);
+
+		await expect(L2Tunnel.transferToL1(L2Token.address, 1))
+			.to.emit(L2Token, "Transfer")
+			.withArgs(L2Tunnel.address, ethers.constants.AddressZero, 1);
+
+		await expect(
+			alice.L1Tunnel.receiveMessage(
+				ethers.utils.defaultAbiCoder.encode(
+					["uint8", "bytes"],
+					[
+						MessageType.L2TransferToL1,
+						ethers.utils.defaultAbiCoder.encode(
+							["tuple(address,address,uint256,string)"],
+							[
+								[
+									alice.TestERC721.address,
+									alice.address,
+									1,
+									"l1://tokenId",
+								],
+							]
+						),
+					]
+				)
+			)
+		)
+			.to.emit(alice.TestERC721, "Transfer")
+			.withArgs(alice.L1Tunnel.address, alice.address, 1);
 	});
 });

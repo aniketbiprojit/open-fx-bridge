@@ -39,7 +39,7 @@ contract CloneAbleERC721 is
 		_setTokenURI(tokenId, _tokenURI);
 	}
 
-	function burn(uint256 tokenId) external onlyL2Tunnel {
+	function burn(uint256 tokenId) external override onlyL2Tunnel {
 		require(ownerOf(tokenId) == L2Tunnel, "Not transferred to L2");
 		_burn(tokenId);
 	}

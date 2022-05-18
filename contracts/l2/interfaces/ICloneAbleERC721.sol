@@ -14,4 +14,6 @@ interface ICloneAbleERC721 {
 		uint256 tokenId,
 		string memory _tokenURI
 	) external;
+
+	function burn(uint256 tokenId) external;
 }

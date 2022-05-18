@@ -32,6 +32,7 @@ interface L2TunnelInterface extends ethers.utils.Interface {
     "renounceOwnership()": FunctionFragment;
     "setFxRootTunnel(address)": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
+    "transferToL1(address,uint256)": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -72,6 +73,10 @@ interface L2TunnelInterface extends ethers.utils.Interface {
     functionFragment: "transferOwnership",
     values: [string]
   ): string;
+  encodeFunctionData(
+    functionFragment: "transferToL1",
+    values: [string, BigNumberish]
+  ): string;
 
   decodeFunctionResult(
     functionFragment: "cloneAbleERC721",
@@ -106,6 +111,10 @@ interface L2TunnelInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "transferOwnership",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "transferToL1",
     data: BytesLike
   ): Result;
 
@@ -211,6 +220,12 @@ export class L2Tunnel extends BaseContract {
       newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    transferToL1(
+      L2TokenAddress: string,
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
   };
 
   cloneAbleERC721(overrides?: CallOverrides): Promise<string>;
@@ -248,6 +263,12 @@ export class L2Tunnel extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  transferToL1(
+    L2TokenAddress: string,
+    tokenId: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   callStatic: {
     cloneAbleERC721(overrides?: CallOverrides): Promise<string>;
 
@@ -282,6 +303,12 @@ export class L2Tunnel extends BaseContract {
 
     transferOwnership(
       newOwner: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    transferToL1(
+      L2TokenAddress: string,
+      tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
   };
@@ -368,6 +395,12 @@ export class L2Tunnel extends BaseContract {
       newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    transferToL1(
+      L2TokenAddress: string,
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -409,6 +442,12 @@ export class L2Tunnel extends BaseContract {
 
     transferOwnership(
       newOwner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    transferToL1(
+      L2TokenAddress: string,
+      tokenId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };
