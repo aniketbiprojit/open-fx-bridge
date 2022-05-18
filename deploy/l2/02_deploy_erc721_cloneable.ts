@@ -10,16 +10,19 @@ const func: DeployFunction = async () => {
 		log: true,
 		skipIfAlreadyDeployed: true,
 	});
-
-	await execute(
-		"CloneAbleERC721",
-		{ from: deployer },
-		"initialize",
-		"",
-		"",
-		ethers.constants.AddressZero,
-		ethers.constants.AddressZero
-	);
+	try {
+		await execute(
+			"CloneAbleERC721",
+			{ from: deployer },
+			"initialize",
+			"",
+			"",
+			ethers.constants.AddressZero,
+			ethers.constants.AddressZero
+		);
+	} catch (err) {
+		console.log("already init");
+	}
 };
 
 export default func;

@@ -8,19 +8,25 @@ const func: DeployFunction = async ({
 	deployments,
 	getNamedAccounts,
 }: HardhatRuntimeEnvironment) => {
-	const { deploy } = deployments;
+	const { deploy, execute } = deployments;
 	const { deployer } = await getNamedAccounts();
 
-	await deploy("TestERC721", {
+	const TestERC721 = await deploy("TestERC721", {
 		from: deployer,
 		contract: "TestERC721",
 		log: true,
 		skipIfAlreadyDeployed: true,
 		args: ["Test", "TT"],
 	});
+
+	await execute(
+		"L1Tunnel",
+		{ from: deployer, log: true },
+		"mapERC721",
+		TestERC721.address
+	);
 };
 
 export default func;
 func.dependencies = [];
 func.tags = ["L1", "TestERC721"];
-func.skip = skipUnlessTest;

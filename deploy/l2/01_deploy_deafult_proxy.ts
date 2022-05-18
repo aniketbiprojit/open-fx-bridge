@@ -22,4 +22,3 @@ const func: DeployFunction = async ({
 export default func;
 func.dependencies = [];
 func.tags = ["L2", "DefaultProxyAdmin"];
-func.skip = skipUnlessTest;
