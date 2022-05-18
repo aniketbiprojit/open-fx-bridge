@@ -8,7 +8,8 @@ contract Tunnel is Ownable {
 	// {from chain}-{type of message}
 	enum MessageType {
 		L1MappingInit,
-		L2MappingComplete
+		L2MappingComplete,
+		L1TransferToL2
 	}
 
 	struct ERC721MappedData {
@@ -17,5 +18,12 @@ contract Tunnel is Ownable {
 		string name;
 		string symbol;
 		address tokenContractOwner;
+	}
+
+	struct ERC721Transfer {
+		address L1Address;
+		address from;
+		uint256 tokenId;
+		string tokenURI;
 	}
 }

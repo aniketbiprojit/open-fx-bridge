@@ -100,6 +100,21 @@ contract L2Tunnel is FxBaseChildTunnel, Tunnel {
 			);
 			return;
 		}
+		if (m == MessageType.L1TransferToL2) {
+			ERC721Transfer memory transferData = abi.decode(
+				data,
+				(ERC721Transfer)
+			);
+
+			address L2Address = fromL1mappedTokens[transferData.L1Address];
+
+			ICloneAbleERC721(L2Address).mint(
+				transferData.from,
+				transferData.tokenId,
+				transferData.tokenURI
+			);
+			return;
+		}
 		revert("Invalid type");
 	}
 }

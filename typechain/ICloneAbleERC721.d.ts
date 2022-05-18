@@ -22,14 +22,20 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 interface ICloneAbleERC721Interface extends ethers.utils.Interface {
   functions: {
     "initialize(string,string,address,address)": FunctionFragment;
+    "mint(address,uint256,string)": FunctionFragment;
   };
 
   encodeFunctionData(
     functionFragment: "initialize",
     values: [string, string, string, string]
   ): string;
+  encodeFunctionData(
+    functionFragment: "mint",
+    values: [string, BigNumberish, string]
+  ): string;
 
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
 
   events: {};
 }
@@ -85,6 +91,13 @@ export class ICloneAbleERC721 extends BaseContract {
       _owner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    mint(
+      to: string,
+      tokenId: BigNumberish,
+      _tokenURI: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
   };
 
   initialize(
@@ -95,12 +108,26 @@ export class ICloneAbleERC721 extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  mint(
+    to: string,
+    tokenId: BigNumberish,
+    _tokenURI: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   callStatic: {
     initialize(
       name_: string,
       symbol_: string,
       _L2Tunnel: string,
       _owner: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    mint(
+      to: string,
+      tokenId: BigNumberish,
+      _tokenURI: string,
       overrides?: CallOverrides
     ): Promise<void>;
   };
@@ -115,6 +142,13 @@ export class ICloneAbleERC721 extends BaseContract {
       _owner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    mint(
+      to: string,
+      tokenId: BigNumberish,
+      _tokenURI: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -123,6 +157,13 @@ export class ICloneAbleERC721 extends BaseContract {
       symbol_: string,
       _L2Tunnel: string,
       _owner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    mint(
+      to: string,
+      tokenId: BigNumberish,
+      _tokenURI: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };

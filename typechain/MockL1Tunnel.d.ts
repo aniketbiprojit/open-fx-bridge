@@ -34,6 +34,7 @@ interface MockL1TunnelInterface extends ethers.utils.Interface {
     "renounceOwnership()": FunctionFragment;
     "setFxChildTunnel(address)": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
+    "transferToL2(address,uint256)": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -79,6 +80,10 @@ interface MockL1TunnelInterface extends ethers.utils.Interface {
     functionFragment: "transferOwnership",
     values: [string]
   ): string;
+  encodeFunctionData(
+    functionFragment: "transferToL2",
+    values: [string, BigNumberish]
+  ): string;
 
   decodeFunctionResult(
     functionFragment: "SEND_MESSAGE_EVENT_SIG",
@@ -123,16 +128,22 @@ interface MockL1TunnelInterface extends ethers.utils.Interface {
     functionFragment: "transferOwnership",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "transferToL2",
+    data: BytesLike
+  ): Result;
 
   events: {
     "L1MappingInitERC721(address,address)": EventFragment;
     "L1MappingMappedERC721(address,address,address)": EventFragment;
+    "L1Transfer(address,address,uint256)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
     "Received(bytes,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "L1MappingInitERC721"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "L1MappingMappedERC721"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "L1Transfer"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Received"): EventFragment;
 }
@@ -143,6 +154,14 @@ export type L1MappingInitERC721Event = TypedEvent<
 
 export type L1MappingMappedERC721Event = TypedEvent<
   [string, string, string] & { L1Token: string; L2Token: string; from: string }
+>;
+
+export type L1TransferEvent = TypedEvent<
+  [string, string, BigNumber] & {
+    L1Token: string;
+    from: string;
+    tokenId: BigNumber;
+  }
 >;
 
 export type OwnershipTransferredEvent = TypedEvent<
@@ -242,6 +261,12 @@ export class MockL1Tunnel extends BaseContract {
       newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    transferToL2(
+      L1TokenAddress: string,
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
   };
 
   SEND_MESSAGE_EVENT_SIG(overrides?: CallOverrides): Promise<string>;
@@ -284,6 +309,12 @@ export class MockL1Tunnel extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  transferToL2(
+    L1TokenAddress: string,
+    tokenId: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   callStatic: {
     SEND_MESSAGE_EVENT_SIG(overrides?: CallOverrides): Promise<string>;
 
@@ -322,6 +353,12 @@ export class MockL1Tunnel extends BaseContract {
       newOwner: string,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    transferToL2(
+      L1TokenAddress: string,
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
   };
 
   filters: {
@@ -351,6 +388,24 @@ export class MockL1Tunnel extends BaseContract {
     ): TypedEventFilter<
       [string, string, string],
       { L1Token: string; L2Token: string; from: string }
+    >;
+
+    "L1Transfer(address,address,uint256)"(
+      L1Token?: null,
+      from?: null,
+      tokenId?: null
+    ): TypedEventFilter<
+      [string, string, BigNumber],
+      { L1Token: string; from: string; tokenId: BigNumber }
+    >;
+
+    L1Transfer(
+      L1Token?: null,
+      from?: null,
+      tokenId?: null
+    ): TypedEventFilter<
+      [string, string, BigNumber],
+      { L1Token: string; from: string; tokenId: BigNumber }
     >;
 
     "OwnershipTransferred(address,address)"(
@@ -432,6 +487,12 @@ export class MockL1Tunnel extends BaseContract {
       newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    transferToL2(
+      L1TokenAddress: string,
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -483,6 +544,12 @@ export class MockL1Tunnel extends BaseContract {
 
     transferOwnership(
       newOwner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    transferToL2(
+      L1TokenAddress: string,
+      tokenId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };

@@ -5,8 +5,9 @@ import "fx-portal/contracts/tunnel/FxBaseRootTunnel.sol";
 import "../Tunnel.sol";
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-contract L1Tunnel is FxBaseRootTunnel, Tunnel {
+contract L1Tunnel is FxBaseRootTunnel, Tunnel, ReentrancyGuard {
 	enum TokenStatus {
 		None,
 		Init,
@@ -15,6 +16,7 @@ contract L1Tunnel is FxBaseRootTunnel, Tunnel {
 
 	event L1MappingInitERC721(address L1Token, address from);
 	event L1MappingMappedERC721(address L1Token, address L2Token, address from);
+	event L1Transfer(address L1Token, address from, uint256 tokenId);
 
 	// L1 address to L2 address
 	mapping(address => address) public mappedTokens;
@@ -50,7 +52,7 @@ contract L1Tunnel is FxBaseRootTunnel, Tunnel {
 		revert("Invalid type");
 	}
 
-	function mapERC721(address L1TokenAddress) public {
+	function mapERC721(address L1TokenAddress) public nonReentrant {
 		require(
 			Ownable(L1TokenAddress).owner() == _msgSender(),
 			"Not owner of L1 Token"
@@ -89,6 +91,39 @@ contract L1Tunnel is FxBaseRootTunnel, Tunnel {
 			_message
 		);
 		emit L1MappingInitERC721(L1TokenAddress, _msgSender());
+
+		_sendMessageToChild(_messageWithType);
+	}
+
+	function transferToL2(address L1TokenAddress, uint256 tokenId)
+		external
+		nonReentrant
+	{
+		require(
+			mappedTokenStatus[L1TokenAddress] == TokenStatus.Mapped,
+			"Token not mapped"
+		);
+
+		IERC721(L1TokenAddress).transferFrom(
+			_msgSender(),
+			address(this),
+			tokenId
+		);
+
+		bytes memory _message = abi.encode(
+			ERC721Transfer({
+				L1Address: L1TokenAddress,
+				from: _msgSender(),
+				tokenId: tokenId,
+				tokenURI: IERC721Metadata(L1TokenAddress).tokenURI(tokenId)
+			})
+		);
+
+		bytes memory _messageWithType = abi.encode(
+			MessageType.L1TransferToL2,
+			_message
+		);
+		emit L1Transfer(L1TokenAddress, _msgSender(), tokenId);
 
 		_sendMessageToChild(_messageWithType);
 	}
