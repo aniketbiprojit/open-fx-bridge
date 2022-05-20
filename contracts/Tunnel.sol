@@ -5,6 +5,12 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "hardhat/console.sol";
 
 contract Tunnel is Ownable {
+	enum TokenStatus {
+		None,
+		Init,
+		Mapped
+	}
+
 	// {from chain}-{type of message}
 	enum MessageType {
 		L1MappingInit,

@@ -33,6 +33,8 @@ contract L2Tunnel is FxBaseChildTunnel, Tunnel, ReentrancyGuard {
 	// L1 address to L2 address
 	mapping(address => address) public fromL1mappedTokens;
 
+	mapping(address => bytes) public mappedTokenMessageData;
+
 	function _deployAndMapERC721(
 		address L1TokenAddress,
 		string memory name_,
@@ -76,7 +78,14 @@ contract L2Tunnel is FxBaseChildTunnel, Tunnel, ReentrancyGuard {
 		);
 		emit L2MappingMappedERC721(L1TokenAddress, token, tokenContractOwner_);
 		// Send message to L1.
+		mappedTokenMessageData[L1TokenAddress] = _messageWithType;
+	}
+
+	function sendDeploymentDataToRoot(address L1TokenAddress) external {
+		bytes memory _messageWithType = mappedTokenMessageData[L1TokenAddress];
+		require(_messageWithType.length != 0, "Invalid");
 		_sendMessageToRoot(_messageWithType);
+		delete mappedTokenMessageData[L1TokenAddress];
 	}
 
 	function _processMessageFromRoot(

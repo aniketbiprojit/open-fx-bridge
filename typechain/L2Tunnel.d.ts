@@ -25,11 +25,13 @@ interface L2TunnelInterface extends ethers.utils.Interface {
     "fromL1mappedTokens(address)": FunctionFragment;
     "fxChild()": FunctionFragment;
     "fxRootTunnel()": FunctionFragment;
+    "mappedTokenMessageData(address)": FunctionFragment;
     "mappedTokens(address)": FunctionFragment;
     "owner()": FunctionFragment;
     "processMessageFromRoot(uint256,address,bytes)": FunctionFragment;
     "proxyAdmin()": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
+    "sendDeploymentDataToRoot(address)": FunctionFragment;
     "setFxRootTunnel(address)": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
     "transferToL1(address,uint256)": FunctionFragment;
@@ -49,6 +51,10 @@ interface L2TunnelInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "mappedTokenMessageData",
+    values: [string]
+  ): string;
+  encodeFunctionData(
     functionFragment: "mappedTokens",
     values: [string]
   ): string;
@@ -64,6 +70,10 @@ interface L2TunnelInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "renounceOwnership",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "sendDeploymentDataToRoot",
+    values: [string]
   ): string;
   encodeFunctionData(
     functionFragment: "setFxRootTunnel",
@@ -92,6 +102,10 @@ interface L2TunnelInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "mappedTokenMessageData",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "mappedTokens",
     data: BytesLike
   ): Result;
@@ -103,6 +117,10 @@ interface L2TunnelInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "proxyAdmin", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "renounceOwnership",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "sendDeploymentDataToRoot",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -194,6 +212,11 @@ export class L2Tunnel extends BaseContract {
 
     fxRootTunnel(overrides?: CallOverrides): Promise<[string]>;
 
+    mappedTokenMessageData(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
     mappedTokens(arg0: string, overrides?: CallOverrides): Promise<[string]>;
 
     owner(overrides?: CallOverrides): Promise<[string]>;
@@ -208,6 +231,11 @@ export class L2Tunnel extends BaseContract {
     proxyAdmin(overrides?: CallOverrides): Promise<[string]>;
 
     renounceOwnership(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    sendDeploymentDataToRoot(
+      L1TokenAddress: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -236,6 +264,11 @@ export class L2Tunnel extends BaseContract {
 
   fxRootTunnel(overrides?: CallOverrides): Promise<string>;
 
+  mappedTokenMessageData(
+    arg0: string,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
   mappedTokens(arg0: string, overrides?: CallOverrides): Promise<string>;
 
   owner(overrides?: CallOverrides): Promise<string>;
@@ -250,6 +283,11 @@ export class L2Tunnel extends BaseContract {
   proxyAdmin(overrides?: CallOverrides): Promise<string>;
 
   renounceOwnership(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  sendDeploymentDataToRoot(
+    L1TokenAddress: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -281,6 +319,11 @@ export class L2Tunnel extends BaseContract {
 
     fxRootTunnel(overrides?: CallOverrides): Promise<string>;
 
+    mappedTokenMessageData(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
     mappedTokens(arg0: string, overrides?: CallOverrides): Promise<string>;
 
     owner(overrides?: CallOverrides): Promise<string>;
@@ -295,6 +338,11 @@ export class L2Tunnel extends BaseContract {
     proxyAdmin(overrides?: CallOverrides): Promise<string>;
 
     renounceOwnership(overrides?: CallOverrides): Promise<void>;
+
+    sendDeploymentDataToRoot(
+      L1TokenAddress: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     setFxRootTunnel(
       _fxRootTunnel: string,
@@ -369,6 +417,11 @@ export class L2Tunnel extends BaseContract {
 
     fxRootTunnel(overrides?: CallOverrides): Promise<BigNumber>;
 
+    mappedTokenMessageData(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     mappedTokens(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     owner(overrides?: CallOverrides): Promise<BigNumber>;
@@ -383,6 +436,11 @@ export class L2Tunnel extends BaseContract {
     proxyAdmin(overrides?: CallOverrides): Promise<BigNumber>;
 
     renounceOwnership(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    sendDeploymentDataToRoot(
+      L1TokenAddress: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -415,6 +473,11 @@ export class L2Tunnel extends BaseContract {
 
     fxRootTunnel(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    mappedTokenMessageData(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     mappedTokens(
       arg0: string,
       overrides?: CallOverrides
@@ -432,6 +495,11 @@ export class L2Tunnel extends BaseContract {
     proxyAdmin(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     renounceOwnership(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    sendDeploymentDataToRoot(
+      L1TokenAddress: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

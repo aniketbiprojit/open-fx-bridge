@@ -8,12 +8,6 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 contract L1Tunnel is FxBaseRootTunnel, Tunnel, ReentrancyGuard {
-	enum TokenStatus {
-		None,
-		Init,
-		Mapped
-	}
-
 	event L1MappingInitERC721(address L1Token, address from);
 	event L1MappingMappedERC721(address L1Token, address L2Token, address from);
 	event L1Transfer(address L1Token, address from, uint256 tokenId);

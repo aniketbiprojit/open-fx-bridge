@@ -72,6 +72,10 @@ describe("Index", () => {
 		)) as CloneAbleERC721;
 		expect(await CloneAbleERC721.name()).to.eq(name);
 		expect(await CloneAbleERC721.symbol()).to.eq(symbol);
+
+		await deployer.L2Tunnel.sendDeploymentDataToRoot(
+			deployer.TestERC721.address
+		);
 	});
 
 	it("map on l1", async () => {
