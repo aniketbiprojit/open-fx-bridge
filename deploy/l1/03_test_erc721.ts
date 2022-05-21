@@ -19,12 +19,16 @@ const func: DeployFunction = async ({
 		args: ["Test", "TT"],
 	});
 
-	await execute(
-		"L1Tunnel",
-		{ from: deployer, log: true },
-		"mapERC721",
-		TestERC721.address
-	);
+	try {
+		await execute(
+			"L1Tunnel",
+			{ from: deployer, log: true },
+			"mapERC721",
+			TestERC721.address
+		);
+	} catch (err) {
+		console.log("err: probably already mapped");
+	}
 };
 
 export default func;

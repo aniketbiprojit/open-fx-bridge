@@ -23,6 +23,13 @@ const func: DeployFunction = async (hre) => {
 		],
 	});
 
+	// await execute(
+	// 	"L2Tunnel",
+	// 	{ from: deployer, log: true },
+	// 	"sendDeploymentDataToRoot",
+	// 	"0x65A3c47D32E5895D1BA1a07ca5c3A79B3f077fC9"
+	// );
+
 	const L1TunnelAddress = await hre.companionNetworks["l1"].deployments.get(
 		"L1Tunnel"
 	);
