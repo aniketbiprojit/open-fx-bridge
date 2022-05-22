@@ -19,6 +19,7 @@ https://mumbai.polygonscan.com/tx/0x078ecaa10dab8246235ea0fd78622bd710c771fc44c9
 
 A final receive message makes the mapping complete.
 
-Example mapping:
-Goerli :  https://goerli.etherscan.io/token/0x65A3c47D32E5895D1BA1a07ca5c3A79B3f077fC9
-Mumbai : https://mumbai.polygonscan.com/token/0xda2575f526cae920b6be8355c821443880add5ad
+Example mapping
+
+- Goerli :  https://goerli.etherscan.io/token/0x65A3c47D32E5895D1BA1a07ca5c3A79B3f077fC9
+- Mumbai : https://mumbai.polygonscan.com/token/0xda2575f526cae920b6be8355c821443880add5ad
