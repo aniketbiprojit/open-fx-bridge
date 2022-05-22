@@ -3,6 +3,11 @@ import { BaseContract, ethers } from 'ethers'
 import { networks } from './config'
 
 export class ContractInstance {
+	static l1Provider: string =
+		'https://goerli.infura.io/v3/9ae618979ecd4afb9e6826f76deb4475'
+
+	static l2Provider: string = 'https://polygon-rpc.com/'
+
 	private static _provider: ethers.providers.Web3Provider
 
 	public static get provider(): ethers.providers.Web3Provider {
