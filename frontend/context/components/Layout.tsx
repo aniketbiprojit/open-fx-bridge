@@ -43,16 +43,18 @@ export const Layout: React.FC = ({ children }) => {
 					</button>
 				</>
 			)}
-			{connectedAddress && incorrectChainId && (
+			{connectedAddress && incorrectChainId ? (
 				<>
 					<div className={styles.incorrectChain}>
-						Please switch to Polygon
+						Please switch to Goerli or Mumbai to continue
 					</div>
+				</>
+			) : (
+				<>
+					<div className={styles.layout}>{children}</div>
 				</>
 			)}
 			{connectedAddress && <>Connected to {connectedAddress}</>}
-
-			<div className={styles.layout}>{children}</div>
 		</>
 	)
 }
