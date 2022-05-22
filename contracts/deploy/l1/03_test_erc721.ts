@@ -1,8 +1,7 @@
-// import { ethers } from 'hardhat'
+import { ethers } from "hardhat";
 import { DeployFunction } from "hardhat-deploy/dist/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { skipUnlessTest } from "../../utils";
-// import { TokenDescriptor } from '../../src/types'
+import { TestERC721 } from "../../typechain";
 
 const func: DeployFunction = async ({
 	deployments,
@@ -29,6 +28,24 @@ const func: DeployFunction = async ({
 	} catch (err) {
 		console.log("err: probably already mapped");
 	}
+	const TestERC721Contract = (await ethers.getContract(
+		"TestERC721"
+	)) as TestERC721;
+	console.log(await TestERC721Contract.tokenURI(1));
+	// const tx = await TestERC721Contract.mint(
+	// 	deployer,
+	// 	"https://storage.googleapis.com/opensea-prod.appspot.com/creature/33.png"
+	// );
+	// await tx.wait();
+
+	// const tx1 = await TestERC721Contract.setApprovalForAll(
+	// 	"0xA2624d1931D17632F74D217Fe1c1C903b65Bf548",
+	// 	true
+	// );
+	// await tx1.wait();
+
+	// const L1TunnelContract = (await ethers.getContract("L1Tunnel")) as L1Tunnel;
+	// (await L1TunnelContract.transferToL2(TestERC721Contract.address, 1)).wait();
 };
 
 export default func;
